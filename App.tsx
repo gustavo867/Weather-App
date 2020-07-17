@@ -4,33 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, ImagePropTypes } from 'react-native';
 import * as Location from 'expo-location';
 
-import api from './api/api';
-
 import { Feather, EvilIcons } from '@expo/vector-icons';
 
 import MainCard from './components/MainCard';
 import InfoCard from './components/InfoCard';
 
-interface Weather {
-  currentTemperature: number,
-  temperatureMin: number,
-  temperatureMax: number,
-  locationName: string,
-  wind: number,
-  humidity: number,
-}
-
 export default function App() {
-  const [weather, setWeather] = useState<Weather[]>([])
   const [darkTheme, setDarkTheme] = useState(true);
-  const [currentTemperature, setCurrentTemperature] = useState('27');
-  const [location, setLocation] = useState();
+  const [currentTemperature, setCurrentTemperature] = useState(0);
+  const [location, setLocation] = useState('');
   const [currentHour, setCurrentHour] = useState('13:00');
 
-  const [wind, setWind] = useState('65');
-  const [moisture, setMoisture] = useState('80');
-  const [tempMin, setTempMin] = useState('21');
-  const [tempMax, setTempMax] = useState('31');
+  const [wind, setWind] = useState(0);
+  const [moisture, setMoisture] = useState(0);
+  const [tempMin, setTempMin] = useState(0);
+  const [tempMax, setTempMax] = useState(0);
 
   const [locationCoords, setLocationCoords] = useState<[number, number]>([0, 1])
 
@@ -132,8 +120,6 @@ export default function App() {
       const lat = locationCoords[0]
       const long = locationCoords[1]
 
-      var result = []
-
       // http://api.openweathermap.org/data/2.5/weather?lat=-16.0401373&lon=-48.0208091&appid=9f569381e0460afaf9bb9aa983bbb18b
       await axios.get(`http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=9f569381e0460afaf9bb9aa983bbb18b`).then(response => {
         const data = response.data
@@ -145,27 +131,33 @@ export default function App() {
         const humidity = data.main.humidity
         const currentTemperature = data.main.temp
 
-        result = [
-          currentTemperature,
-          temperatureMin,
-          temperatureMax,
-          locationName,
-          wind,
-          humidity
-        ]
-        setWeather(result)
+        
+        setLocation(locationName)
+        setTempMin(convertKelvin(temperatureMin))
+        setTempMax(convertKelvin(temperatureMax))
+        setWind(wind)
+        setMoisture(humidity)
+        setCurrentTemperature(convertKelvin(currentTemperature))
       })
     }
     getCurrentWeather()
-    console.log(weather)
+    // console.log(weather)
   }, [])
+  
+  function convertKelvin(kelvin: number) {
+    return parseInt<Number>(kelvin - 273)
+  }  
 
-
+  function Hour() {
+    let date = new Date()
+      setCurrentHour(date.getHours() + ':' + date.getMinutes())
+  }
+  
   return (
     <View style={styles.container}>
       <StatusBar style="auto"/>
       <TouchableOpacity style={styles.refreshButton}>
-       <EvilIcons name="refresh" size={40} color={darkTheme ? '#e0e0e0' : '#121212'}/>
+       <EvilIcons onPress={Hour} name="refresh" size={40} color={darkTheme ? '#e0e0e0' : '#121212'}/>
       </TouchableOpacity>
       <Feather style={{ marginTop: 65 }} name="sun" size={50} color="#EDB230"/>
       <View style={styles.temperature}>
@@ -183,12 +175,14 @@ export default function App() {
 
       <View style={styles.info}>
         <Text style={styles.infoText}>Additional Informations</Text>
-        <View style={styles.infoCard}>
-          <InfoCard title="Wind" value={wind + ' m/h'}></InfoCard>
-          <InfoCard title="Moisture" value={moisture + '%'}></InfoCard>
-          <InfoCard title="Temp. Min" value={tempMin + '°'}></InfoCard>
-          <InfoCard title="Temp. Max" value={tempMax + '°'}></InfoCard>
-        </View>
+          
+            <View style={styles.infoCard}>              
+                <InfoCard  title="Wind" value={wind + ' m/h'}></InfoCard>
+                <InfoCard title="Moisture" value={moisture + '%'}></InfoCard>
+                <InfoCard title="Temp. Min" value={tempMin + '°'}></InfoCard>
+                <InfoCard title="Temp. Max" value={tempMax + '°'}></InfoCard>
+            </View>
+          
       </View>
 
       <View style={styles.themeButton}>
