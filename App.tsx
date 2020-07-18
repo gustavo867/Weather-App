@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, ImagePropTypes } from 'react-native';
 import * as Location from 'expo-location';
 
-import { Feather, EvilIcons } from '@expo/vector-icons';
+import { Feather, EvilIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import MainCard from './components/MainCard';
 import InfoCard from './components/InfoCard';
@@ -81,18 +81,14 @@ export default function App() {
     squareButton: {
       backgroundColor: darkTheme ? '#f2f2f2' : '#8f8f8f',
       justifyContent: 'center',
-      borderRadius: 20,
+      borderRadius: 25,
       marginRight: 20,
       width: 50,
-      height: 25,
+      height: 35,
     },
     circleButton: {
-      backgroundColor: darkTheme ? '#232634' : '#f2f2f2',
       alignSelf: darkTheme ? 'flex-end' : 'flex-start',
       margin: 5,
-      width: 30,
-      height: 30,
-      borderRadius: 50,
     },
   });
 
@@ -141,7 +137,6 @@ export default function App() {
       })
     }
     getCurrentWeather()
-    // console.log(weather)
   }, [])
   
   function convertKelvin(kelvin: number) {
@@ -188,7 +183,7 @@ export default function App() {
       <View style={styles.themeButton}>
         <View style={styles.squareButton}>
           <TouchableOpacity style={styles.circleButton} onPress={handleDarkTheme}>
-
+           <MaterialCommunityIcons name={darkTheme ? 'weather-night' : 'weather-sunny'} size={30} color={darkTheme ? '#7F7EFF' : '#EDB230'} />
           </TouchableOpacity>
         </View>
       </View>
